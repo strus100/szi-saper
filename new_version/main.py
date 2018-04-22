@@ -1,6 +1,7 @@
 import pygame
 import time
 import random
+import time
 
 from field import Field
 from grid import Grid
@@ -97,6 +98,12 @@ def get_distance(field_a, field_b):
 def robot(x,y):
     gameDisplay.blit(robotImg, (x, y))
 
+def move_robot(path):
+    field = path[0]
+    gameDisplay.blit(robotImg, (field.x, field.y))
+    path.remove(field)
+    return path
+
 
 [first_field, last_field] = map_obj.first_and_last()
 print(first_field.get_position())
@@ -120,8 +127,8 @@ find_path(first_field, last_field)
 
 def game_loop():
 
-    robot_x = (display_width * 0.4)
-    robot_y = (display_height - robot_height)
+    robot_x = (0)
+    robot_y = (0)
 
     gameExit = False
 
@@ -143,32 +150,19 @@ def game_loop():
         # x += x_change
 
         gameDisplay.fill(white)
-        if random.randrange(2) == 1:
-            for y in map:
-                for x in y:
-                    gameDisplay.fill(x.color, (x.x, x.y, field_width, field_height))
-                    if x.has_bomb == True:
-                        gameDisplay.blit(bombaImg, (x.x, x.y))
+        for y in map:
+            for x in y:
+                gameDisplay.fill(x.color, (x.x, x.y, field_width, field_height))
+                if x.has_bomb == True:
+                    gameDisplay.blit(bombaImg, (x.x, x.y))
 
-            if len(map_obj.path) > 0:
-                for field in map_obj.path:
-                    gameDisplay.fill((0,0,255), (field.x, field.y, field_width, field_height))
+        if len(map_obj.path) > 0:
+            map_obj.set_path(move_robot(map_obj.path))
         else:
-            if len(map_obj.path) > 0:
-                for field in map_obj.path:
-                    gameDisplay.fill((0,0,255), (field.x, field.y, field_width, field_height))
-
-            for y in map:
-                for x in y:
-                    gameDisplay.fill(x.color, (x.x, x.y, field_width, field_height))
-                    if x.has_bomb == True:
-                        gameDisplay.blit(bombaImg, (x.x, x.y))
-
-
-        robot(robot_x, robot_y)
-
+            robot(0,0)
+           
         pygame.display.update()
-        clock.tick(5)
+        clock.tick(1)
 
 game_loop()
 pygame.quit()
