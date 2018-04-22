@@ -98,8 +98,28 @@ def get_distance(field_a, field_b):
 def robot(x,y):
     gameDisplay.blit(robotImg, (x, y))
 
+def text_objects(text, font):
+    textSurface = font.render(text, True, black)
+    return textSurface, textSurface.get_rect()
+
+def print_alert():
+    text = "O mamuniu, bomba"
+    
+    large_text = pygame.font.Font('freesansbold.ttf', 115)
+    TextSurf, TextRect = text_objects(text, large_text)
+    TextRect.center = ((display_width/2), display_height/2)
+    gameDisplay.blit(TextSurf, TextRect)
+
+    pygame.display.update()
+
+    # time.sleep(2)
+
+    # game_loop()
+
 def move_robot(path):
     field = path[0]
+    if field.has_bomb == True:
+        print_alert()
     gameDisplay.blit(robotImg, (field.x, field.y))
     path.remove(field)
     return path
@@ -162,7 +182,7 @@ def game_loop():
             robot(0,0)
            
         pygame.display.update()
-        clock.tick(1)
+        clock.tick(2)
 
 game_loop()
 pygame.quit()
