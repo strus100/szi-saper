@@ -36,7 +36,7 @@ class Grid:
                 x_index = int(check_x*0.01)
                 y_index = int(check_y*0.01)
 
-                if (x_index >= 0 and x_index <= self.width and y_index >= 0 and y_index < self.height):
+                if (x_index >= 0 and x_index < self.width and y_index >= 0 and y_index < self.height):
                     
                     neighbours.insert(len(neighbours), self.grid[y_index][x_index])
 
@@ -46,4 +46,4 @@ class Grid:
         self.path = path
 
     def first_and_last(self):
-        return [self.grid[1][0], self.grid[self.width-1][self.height-1]]
+        return [self.grid[0][0], self.grid[self.width-1][self.height-1]]
