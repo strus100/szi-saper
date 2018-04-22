@@ -1,109 +1,159 @@
 import pygame
-from pygame.locals import *
-from implementation import *
-import sys
-import heapq
-from pip._vendor.distlib.compat import raw_input
+import time
+import random
+import time
+
+from field import Field
+from grid import Grid
 
 pygame.init()
 
+display_width = 700
+display_height = 700
 
-white = (255, 255, 255, 255)
-OKNOGRY = pygame.display.set_mode((816, 624), 0, 32)
-pygame.display.set_caption('SAPER')
-x = (48)
-y = (96)
-mapImg = pygame.image.load('mapaSaper.png')
+black = (0,0,0)
+white = (255,255,255)
+
+gameDisplay = pygame.display.set_mode((display_width, display_height))
+
+pygame.display.set_caption('Saper')
+
+clock = pygame.time.Clock()
+
+# size of robot img
+robot_width = 80
+robot_height = 80
+
 robotImg = pygame.image.load('robot.png')
+robotImg = pygame.transform.scale(robotImg, (robot_width, robot_height))
 
-def robot(x, y):
-	OKNOGRY.blit(robotImg, (x, y))
+bombaImg = pygame.image.load('bomba.png')
+bombaImg = pygame.transform.scale(bombaImg, (robot_width, robot_height))
 
-def heuristic(a, b):
 
-    (x1, y1) = a
-    (x2, y2) = b
-    OKNOGRY.blit(robotImg, (x2*48, y2*48))
+field_width = 100
+field_height = 100
+
+map_obj = Grid(10,10, field_width, field_height)
+map = map_obj.grid
+
+# find_path takes `Field` objects 
+def find_path(start_field, target_field):
+    open_set = []
+    closed_set = []
+    open_set.insert(0, start_field)
+
+    while len(open_set) > 0:
+        current_field = open_set[0]
+        for open_field in open_set:
+            if open_field.f_cost() < current_field.f_cost() or open_field.f_cost == current_field.f_cost and open_field.h_cost < current_field.h_cost:
+                current_field = open_field
+
+        open_set.remove(current_field)
+        closed_set.insert(len(closed_set), current_field)
+
+        if current_field == target_field:
+            print("ZNALAZLEM")
+            retrace_path(start_field, target_field)
+            return
+        
+        # print(map_obj.get_neighbours(current_field))
+
+        for neighbour in map_obj.get_neighbours(current_field):
+            if not neighbour.walkable or neighbour in closed_set:
+                continue
+
+            new_movement_cost_to_neighbour = current_field.g_cost + get_distance(current_field, neighbour)
+            if new_movement_cost_to_neighbour < neighbour.g_cost or not neighbour in open_set:
+                neighbour.g_cost = new_movement_cost_to_neighbour
+                neighbour.h_cost = get_distance(neighbour, target_field)
+                neighbour.set_parent(current_field)
+
+                if not neighbour in open_set:
+                    open_set.insert(len(open_set), neighbour)
+        
+def retrace_path(start_field, end_node):
+    path = []
+    current_field = end_node
+
+    while (current_field != start_field):
+        path.insert(len(path), current_field)
+        current_field = current_field.parent
+
+    path = path[::-1]
+    map_obj.set_path(path)
+
+    for field in path:
+        print(field.get_position())
+
+
+def get_distance(field_a, field_b):
+    dist_x = abs(field_a.x - field_b.x)
+    dist_y = abs(field_a.y - field_b.y)
+
+    if dist_x > dist_y:
+        return 14*dist_y + 10*(dist_x-dist_y)
+    return 14*dist_y + 10*(dist_y-dist_x)
+
+def robot(x,y):
+    gameDisplay.blit(robotImg, (x, y))
+
+def text_objects(text, font):
+    textSurface = font.render(text, True, black)
+    return textSurface, textSurface.get_rect()
+
+def print_alert():
+    text = "O mamuniu, bomba"
+    
+    large_text = pygame.font.Font('freesansbold.ttf', 90)
+    TextSurf, TextRect = text_objects(text, large_text)
+    TextRect.center = ((display_width/2), display_height/2)
+    gameDisplay.blit(TextSurf, TextRect)
+
     pygame.display.update()
-    return abs(x1 - x2) + abs(y1 - y2)
 
 
-class PriorityQueue:
-    def __init__(self):
-        self.elements = []
-
-    def empty(self):
-        return len(self.elements) == 0
-
-    def put(self, item, priority):
-        heapq.heappush(self.elements, (priority, item))
-
-    def get(self):
-        return heapq.heappop(self.elements)[1]
+def move_robot(path):
+    field = path[0]
+    if field.has_bomb == True:
+        print_alert()
+    gameDisplay.blit(robotImg, (field.x, field.y))
+    path.remove(field)
+    return path
 
 
-def a_star_search(graph, start, goal):
-    frontier = PriorityQueue()
-    frontier.put(start, 0)
-    came_from = {}
-    cost_so_far = {}
-    came_from[start] = None
-    cost_so_far[start] = 0
+[first_field, last_field] = map_obj.first_and_last()
+print(first_field.get_position())
+find_path(first_field, last_field)
 
-    while not frontier.empty():
-        current = frontier.get()
+def game_loop():
 
-        if current == goal:
-            break
+    robot_x = (0)
+    robot_y = (0)
 
-        for next in graph.neighbors(current):
-            new_cost = cost_so_far[current] + graph.cost(current, next)
-            if next not in cost_so_far or new_cost < cost_so_far[next]:
-                cost_so_far[next] = new_cost
-                priority = new_cost + heuristic(goal, next)
-                frontier.put(next, priority)
-                came_from[next] = current
+    gameExit = False
 
-    return came_from, cost_so_far
+    while not gameExit: 
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
+        gameDisplay.fill(white)
+        for y in map:
+            for x in y:
+                gameDisplay.fill(x.color, (x.x, x.y, field_width, field_height))
+                if x.has_bomb == True:
+                    gameDisplay.blit(bombaImg, (x.x, x.y))
 
-start, goal = (1, 2), (7, 8)
-# came_from, cost_so_far = a_star_search(diagram4, start, goal)
-# draw_grid(diagram4, width=3, point_to=came_from, start=start, goal=goal)
-# print()
-# draw_grid(diagram4, width=3, number=cost_so_far, start=start, goal=goal)
-# print()
+        if len(map_obj.path) > 0:
+            map_obj.set_path(move_robot(map_obj.path))
+        else:
+            robot(0,0)
+           
+        pygame.display.update()
+        clock.tick(2)
 
-
-def krata():
-    for i in range(0,13):
-        for j in range(0,17):
-
-            pygame.draw.rect(OKNOGRY, (0,0,0), Rect((j*48,i*48),(48,48)), 1)
-
-
-while True:
-
-
-    for event in pygame.event.get():
-
-
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
-
-    OKNOGRY.blit(mapImg, (0, 0))
-    robot(x, y)
-    pygame.display.update()
-
-    # events = pygame.event.get()
-    # for event in events:
-    #     if event.type == pygame.KEYDOWN:
-    #         if event.key == pygame.K_LEFT:
-    #             robot(x+48,y)
-    #         if event.key == pygame.K_RIGHT:
-    #             robot(x,y + 48)
-
-
-
+game_loop()
+pygame.quit()
+quit()
