@@ -105,7 +105,7 @@ def text_objects(text, font):
 def print_alert():
     text = "O mamuniu, bomba"
     
-    large_text = pygame.font.Font('freesansbold.ttf', 115)
+    large_text = pygame.font.Font('freesansbold.ttf', 90)
     TextSurf, TextRect = text_objects(text, large_text)
     TextRect.center = ((display_width/2), display_height/2)
     gameDisplay.blit(TextSurf, TextRect)
