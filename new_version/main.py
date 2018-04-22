@@ -8,8 +8,8 @@ from grid import Grid
 
 pygame.init()
 
-display_width = 1000
-display_height = 1000
+display_width = 700
+display_height = 700
 
 black = (0,0,0)
 white = (255,255,255)
@@ -112,9 +112,6 @@ def print_alert():
 
     pygame.display.update()
 
-    # time.sleep(2)
-
-    # game_loop()
 
 def move_robot(path):
     field = path[0]
@@ -129,22 +126,6 @@ def move_robot(path):
 print(first_field.get_position())
 find_path(first_field, last_field)
 
-# def text_objects(text, font):
-#     textSurface = font.render(text, True, black)
-#     return textSurface, textSurface.get_rect()
-
-# def message_display(text):
-#     large_text = pygame.font.Font('freesansbold.ttf', 115)
-#     TextSurf, TextRect = text_objects(text, large_text)
-#     TextRect.center = ((display_width/2), display_height/2)
-#     gameDisplay.blit(TextSurf, TextRect)
-
-#     pygame.display.update()
-
-#     time.sleep(2)
-
-#     game_loop()
-
 def game_loop():
 
     robot_x = (0)
@@ -157,17 +138,6 @@ def game_loop():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        #     if event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_LEFT:
-        #             x_change = -5
-        #         elif event.key == pygame.K_RIGHT:
-        #             x_change = 5
-
-        #     if event.type == pygame.KEYUP:
-        #         if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-        #             x_change = 0
-
-        # x += x_change
 
         gameDisplay.fill(white)
         for y in map:
