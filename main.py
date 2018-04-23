@@ -1,9 +1,5 @@
 import pygame
-import time
-import random
-import time
 
-from field import Field
 from grid import Grid
 
 pygame.init()
