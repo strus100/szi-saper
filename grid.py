@@ -17,13 +17,13 @@ class Grid:
             horizontal = []
             for x in range(0, width):
                 is_wall_field = random.randrange(12) != 1
-                field = Field(x, y, {'is_bomb': False}, field_width, field_height, is_wall_field, self.is_bomb_field(is_wall_field, x, y))
+                field = Field(x, y, {'is_bomb': False}, field_width, field_height, is_wall_field, self.is_bomb_field(is_wall_field))
                 horizontal.insert(len(horizontal), field)
             self.grid.insert(len(self.grid), horizontal)
 
-    def is_bomb_field(self, is_walkable, x, y):
+    def is_bomb_field(self, is_walkable):
         if is_walkable:
-            return random.randrange(30) == 1 or y == 5 and x == 5
+            return random.randrange(30) == 1
         else:
             return False
 
