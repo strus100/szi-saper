@@ -75,11 +75,12 @@ def find_path(start_field, target_field):
 def retrace_path(start_field, end_node):
     path = []
     current_field = end_node
-
+    
     while (current_field != start_field):
         path.insert(len(path), current_field)
         current_field = current_field.parent
 
+    path.insert(len(path), start_field)
     path = path[::-1]
     map_obj.set_path(path)
 
@@ -152,7 +153,7 @@ def game_loop():
             robot(0,0)
            
         pygame.display.update()
-        clock.tick(2)
+        clock.tick(1)
 
 game_loop()
 pygame.quit()
