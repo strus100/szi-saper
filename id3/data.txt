@@ -1,0 +1,1 @@
+// is_beeping: yes/no | metal_detector_beeping: no/weak/hard | is_dugged_up: true/false | war_here?: no/march_of_troops/trenches
