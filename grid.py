@@ -3,8 +3,7 @@ import random
 
 class Grid:
 
-    def __init__(self, width, height, field_width, field_height):
-
+    def __init__(self, width, height, field_width, field_height, params_data):
         self.grid = []
         self.width = width
         self.height = height
@@ -17,7 +16,10 @@ class Grid:
             horizontal = []
             for x in range(0, width):
                 is_wall_field = self.get_is_wall_field(width, x, y)
-                field = Field(x, y, {'is_bomb': False}, field_width, field_height, not is_wall_field, self.is_bomb_field(not is_wall_field))
+                is_bomb = self.is_bomb_field(not is_wall_field)
+                # field_params = self.generate_non_bomb_field_params(params_data)
+                field_params = self.generate_bomb_field_params(params_data) if is_bomb else self.generate_non_bomb_field_params(params_data)
+                field = Field(x, y, field_params, field_width, field_height, not is_wall_field, is_bomb)
                 horizontal.insert(len(horizontal), field)
             self.grid.insert(len(self.grid), horizontal)
 
@@ -59,3 +61,18 @@ class Grid:
 
     def first_and_last(self):
         return [self.grid[0][0], self.grid[self.width-1][self.height-1]]
+
+    def generate_bomb_field_params(self, params_data):
+        # 1. Filtrujemy tablice na YES
+        params_with_yes = list(filter(lambda x: x[-1] == '1', params_data))
+        # 2. Robimy randoma od 0 do tyle ile jest pól YES
+        how_many_yeses = len(params_with_yes)
+        n = random.randrange(how_many_yeses)
+        # 3. Wybeiramy na podstawie randoma paramsy z tablicy
+        return params_with_yes[n]
+
+    def generate_non_bomb_field_params(self, params_data):
+        params_with_no = list(filter(lambda x: x[-1] == '0', params_data))
+        how_many_no = len(params_with_no)
+        n = random.randrange(how_many_no)
+        return params_with_no[n]

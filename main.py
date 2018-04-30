@@ -1,6 +1,7 @@
 import pygame
 
 from grid import Grid
+from txt_parser import TxtParser
 
 pygame.init()
 
@@ -30,7 +31,10 @@ bombaImg = pygame.transform.scale(bombaImg, (robot_width, robot_height))
 field_width = 100
 field_height = 100
 
-map_obj = Grid(10,10, field_width, field_height)
+parser = TxtParser()
+field_params = parser.parse("data.txt")
+
+map_obj = Grid(10,10, field_width, field_height, field_params)
 map = map_obj.grid
 
 # find_path takes `Field` objects 
@@ -50,8 +54,8 @@ def find_path(start_field, target_field):
 
         if current_field == target_field:
             print("ZNALAZLEM")
-            retrace_path(start_field, target_field)
-            return
+            return retrace_path(start_field, target_field)
+            # return
         
         # print(map_obj.get_neighbours(current_field))
 
@@ -78,10 +82,11 @@ def retrace_path(start_field, end_node):
 
     path.insert(len(path), start_field)
     path = path[::-1]
-    map_obj.set_path(path)
+    # map_obj.set_path(path)
+    return path
 
-    for field in path:
-        print(field.get_position())
+    # for field in path:
+    #     print(field.get_position())
 
 
 def get_distance(field_a, field_b):
@@ -120,11 +125,27 @@ def move_robot(path):
 
 
 [first_field, last_field] = map_obj.first_and_last()
-print(first_field.get_position())
-find_path(first_field, last_field)
 
-def game_loop():
+def scan_for_bombs():
+    fields_with_bombs = []
+    for y in map:
+        for x in y:
+            if x.has_bomb:
+                fields_with_bombs.insert(len(fields_with_bombs), x)
+    return fields_with_bombs
 
+fields_with_bombs = scan_for_bombs()
+# path_to_first_bomb = find_path(first_field, first_bomb)
+
+
+def game_loop(start_point, fields_with_bombs):
+# 1. Ogarnij ścieżke do bomby
+# 2. zapierdalaj tam
+# 3. powtórz
+    current_field = start_point
+    field_to_move = fields_with_bombs[0]
+    fields_with_bombs.remove(field_to_move)
+    path = find_path(current_field, field_to_move)
     robot_x = (0)
     robot_y = (0)
 
@@ -143,14 +164,18 @@ def game_loop():
                 if x.has_bomb == True:
                     gameDisplay.blit(bombaImg, (x.x, x.y))
 
-        if len(map_obj.path) > 0:
-            map_obj.set_path(move_robot(map_obj.path))
+        if len(path) > 0:
+            current_field = path[0]
+            path = move_robot(path)
         else:
-            robot(0,0)
+            field_to_move = fields_with_bombs[0]
+            fields_with_bombs.remove(field_to_move)
+            path = find_path(current_field, field_to_move)
            
         pygame.display.update()
-        clock.tick(1)
+        clock.tick(3)
 
-game_loop()
+
+game_loop(first_field, fields_with_bombs)
 pygame.quit()
 quit()

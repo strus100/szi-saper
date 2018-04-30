@@ -2,7 +2,13 @@ class Field:
     def __init__(self, x, y, params, width, height, walkable = True, has_bomb = False):
         self.x = x * width
         self.y = y * height
-        self.params = params
+        self.params = {
+            'picture': "path/to/file",
+            'is_beeping': "1",
+            'metal_detector_beeping': "weak",
+            'is_dugged_up': '1',
+            'war_here?': "trenches"
+        }
         self.walkable = walkable
         self.has_bomb = has_bomb
 
