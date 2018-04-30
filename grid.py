@@ -17,7 +17,7 @@ class Grid:
             horizontal = []
             for x in range(0, width):
                 is_wall_field = self.get_is_wall_field(width, x, y)
-                field = Field(x, y, {'is_bomb': False}, field_width, field_height, not is_wall_field, self.is_bomb_field(is_wall_field))
+                field = Field(x, y, {'is_bomb': False}, field_width, field_height, not is_wall_field, self.is_bomb_field(not is_wall_field))
                 horizontal.insert(len(horizontal), field)
             self.grid.insert(len(self.grid), horizontal)
 
