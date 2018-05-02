@@ -56,11 +56,25 @@ def move_robot(field):
 
 def scan_for_bombs():
     fields_with_bombs = []
+    p = Parser()
+    tree = p.parse_tree('id3/tree.json')
     for y in map:
         for x in y:
-            if x.has_bomb:
+            if is_bomb_here(x, tree):
+                print(x.get_position())
                 fields_with_bombs.insert(len(fields_with_bombs), x)
     return fields_with_bombs
+
+def is_bomb_here(field, tree):
+        factor = tree['value']
+        factor_value = field.params[factor]
+        tree_answer = tree[factor_value]
+
+        if isinstance(tree_answer, str):
+            return True if tree_answer == "YES" else False
+        else:
+            new_tree = tree_answer
+            return is_bomb_here(field, tree_answer)
 
 fields_with_bombs = scan_for_bombs()
 
@@ -102,6 +116,7 @@ def game_loop(start_point, fields_with_bombs):
         pygame.display.update()
         clock.tick(3)
 
+first_field
 
 game_loop(first_field, fields_with_bombs)
 pygame.quit()

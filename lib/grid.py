@@ -59,6 +59,11 @@ class Grid:
     def generate_params(self, params_data, is_bomb):
         is_bomb = int(is_bomb)
         correct_params = list(filter(lambda x: x[-1] == f"{is_bomb}", params_data))
+        correct_params = list(map(self.list_to_dict, correct_params))
         correct_params_amount = len(correct_params)
         n = random.randrange(correct_params_amount)
         return correct_params[n]
+
+    def list_to_dict(self, params):
+        [q,w,e,r,t] = params
+        return {"is_beeping": q, "metal_detector_beeping": w, "is_dugged_up": e, "war_here": r}
