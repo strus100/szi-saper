@@ -5,8 +5,8 @@ from a_star import AStar
 
 pygame.init()
 
-display_width = 300
-display_height = 300
+display_width = 800
+display_height = 800
 
 black = (0,0,0)
 
