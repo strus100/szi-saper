@@ -1,6 +1,6 @@
 import pygame
 from grid import Grid
-from txt_parser import TxtParser
+from parser import Parser
 from a_star import AStar
 
 pygame.init()
@@ -19,14 +19,14 @@ field_size = display_height / how_many_fields
 
 robot_size = int(field_size * 0.8)
 
-robotImg = pygame.image.load('../images/robot.png')
+robotImg = pygame.image.load('images/robot.png')
 robotImg = pygame.transform.scale(robotImg, (robot_size, robot_size))
 
-bombaImg = pygame.image.load('../images/bomba.png')
+bombaImg = pygame.image.load('images/bomba.png')
 bombaImg = pygame.transform.scale(bombaImg, (robot_size, robot_size))
 
-parser = TxtParser()
-field_params = parser.parse("../data/data.txt")
+parser = Parser()
+field_params = parser.parse_data("data/data.txt")
 
 map_obj = Grid(how_many_fields, field_size, field_params)
 map = map_obj.grid

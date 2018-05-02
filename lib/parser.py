@@ -1,5 +1,5 @@
-class TxtParser:
-    def parse(self, file_name):
+class Parser:
+    def parse_data(self, file_name):
         to_return = []
         file = open(file_name, "r")
         for line in file:
