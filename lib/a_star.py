@@ -29,7 +29,6 @@ class AStar:
 
                     if not neighbour in open_set:
                         open_set.insert(len(open_set), neighbour)
-        
     def retrace_path(self, start_field, end_node):
         path = []
         current_field = end_node
@@ -40,16 +39,11 @@ class AStar:
 
         path.insert(len(path), start_field)
         path = path[::-1]
-        # map_obj.set_path(path)
         return path
 
-        # for field in path:
-        #     print(field.get_position())
-
-
     def get_distance(self, field_a, field_b):
-        dist_x = abs(field_a.x - field_b.x)
-        dist_y = abs(field_a.y - field_b.y)
+        dist_x = abs(field_a.map_x - field_b.map_x)
+        dist_y = abs(field_a.map_y - field_b.map_y)
 
         if dist_x > dist_y:
             return 14*dist_y + 10*(dist_x-dist_y)

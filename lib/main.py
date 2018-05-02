@@ -1,39 +1,34 @@
 import pygame
-
 from grid import Grid
 from txt_parser import TxtParser
 from a_star import AStar
 
 pygame.init()
 
-display_width = 1000
-display_height = 1000
+display_width = 300
+display_height = 300
 
 black = (0,0,0)
-white = (255,255,255)
 
 gameDisplay = pygame.display.set_mode((display_width, display_height))
-
 pygame.display.set_caption('Saper')
-
 clock = pygame.time.Clock()
 
-robot_width = 80
-robot_height = 80
+how_many_fields = 10
+field_size = display_height / how_many_fields
+
+robot_size = int(field_size * 0.8)
 
 robotImg = pygame.image.load('../images/robot.png')
-robotImg = pygame.transform.scale(robotImg, (robot_width, robot_height))
+robotImg = pygame.transform.scale(robotImg, (robot_size, robot_size))
 
 bombaImg = pygame.image.load('../images/bomba.png')
-bombaImg = pygame.transform.scale(bombaImg, (robot_width, robot_height))
-
-field_width = 100
-field_height = 100
+bombaImg = pygame.transform.scale(bombaImg, (robot_size, robot_size))
 
 parser = TxtParser()
 field_params = parser.parse("../data/data.txt")
 
-map_obj = Grid(10,10, field_width, field_height, field_params)
+map_obj = Grid(how_many_fields, field_size, field_params)
 map = map_obj.grid
 
 def text_objects(text, font):
@@ -54,7 +49,7 @@ def print_alert():
 def move_robot(field):
     if field.has_bomb == True:
         print_alert()
-    gameDisplay.blit(robotImg, (field.x, field.y))
+    gameDisplay.blit(robotImg, (field.map_x, field.map_y))
 
 
 [first_field, last_field] = map_obj.first_and_last()
@@ -68,7 +63,6 @@ def scan_for_bombs():
     return fields_with_bombs
 
 fields_with_bombs = scan_for_bombs()
-# path_to_first_bomb = find_path(first_field, first_bomb)
 
 
 def game_loop(start_point, fields_with_bombs):
@@ -88,12 +82,11 @@ def game_loop(start_point, fields_with_bombs):
                 pygame.quit()
                 quit()
 
-        gameDisplay.fill(white)
         for y in map:
             for x in y:
-                gameDisplay.fill(x.color, (x.x, x.y, field_width, field_height))
+                gameDisplay.fill(x.color, (x.map_x, x.map_y, field_size, field_size))
                 if x.has_bomb == True:
-                    gameDisplay.blit(bombaImg, (x.x, x.y))
+                    gameDisplay.blit(bombaImg, (x.map_x, x.map_y))
 
         if len(path) > 0:
             current_field = path[0]

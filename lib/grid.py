@@ -3,28 +3,25 @@ import random
 
 class Grid:
 
-    def __init__(self, width, height, field_width, field_height, params_data):
+    def __init__(self, how_many_fields, field_size, params_data):
         self.grid = []
-        self.width = width
-        self.height = height
+        self.how_many_fields = how_many_fields
         self.path = []
 
-        self.drawing_height = height*field_height
-        self.drawing_width = width*field_width
+        self.drawing_size = how_many_fields*field_size
 
-        for y in range(0, height):
+        for y in range(0, how_many_fields):
             horizontal = []
-            for x in range(0, width):
-                is_wall_field = self.get_is_wall_field(width, x, y)
+            for x in range(0, how_many_fields):
+                is_wall_field = self.is_wall_field(how_many_fields, x, y)
                 is_bomb = self.is_bomb_field(not is_wall_field)
-                # field_params = self.generate_non_bomb_field_params(params_data)
-                field_params = self.generate_bomb_field_params(params_data) if is_bomb else self.generate_non_bomb_field_params(params_data)
-                field = Field(x, y, field_params, field_width, field_height, not is_wall_field, is_bomb)
+                field_params = self.generate_params(params_data, is_bomb)
+                field = Field(x, y, field_params, field_size, not is_wall_field, is_bomb)
                 horizontal.insert(len(horizontal), field)
             self.grid.insert(len(self.grid), horizontal)
 
-    def get_is_wall_field(self, width, x, y):
-        if (x == (width-1) and (y == (width-1))):
+    def is_wall_field(self, how_many_fields, x, y):
+        if (x == (how_many_fields-1) and (y == (how_many_fields-1))):
             is_wall_field = False
         else:
             is_wall_field = random.randrange(12) == 1
@@ -39,40 +36,29 @@ class Grid:
     def get_neighbours(self, field):
         neighbours = []
 
-        for x in range(-100, 101, 100):
-            for y in range(-100, 101, 100):
+        for x in range(-1, 2):
+            for y in range(-1, 2):
                 if x == 0 and y == 0:
                     continue
                 
                 check_x = field.x + x
                 check_y = field.y + y
 
-                x_index = int(check_x*0.01)
-                y_index = int(check_y*0.01)
-
-                if (x_index >= 0 and x_index < self.width and y_index >= 0 and y_index < self.height):
-                    
-                    neighbours.insert(len(neighbours), self.grid[y_index][x_index])
-
+                if (check_x >= 0 and check_x < self.how_many_fields and check_y >= 0 and check_y < self.how_many_fields):
+                    neighbours.insert(len(neighbours), self.grid[check_y][check_x])
+        
         return neighbours
 
     def set_path(self, path):
         self.path = path
 
     def first_and_last(self):
-        return [self.grid[0][0], self.grid[self.width-1][self.height-1]]
+        last = self.how_many_fields -1
+        return [self.grid[0][0], self.grid[last][last]]
 
-    def generate_bomb_field_params(self, params_data):
-        # 1. Filtrujemy tablice na YES
-        params_with_yes = list(filter(lambda x: x[-1] == '1', params_data))
-        # 2. Robimy randoma od 0 do tyle ile jest pól YES
-        how_many_yeses = len(params_with_yes)
-        n = random.randrange(how_many_yeses)
-        # 3. Wybeiramy na podstawie randoma paramsy z tablicy
-        return params_with_yes[n]
-
-    def generate_non_bomb_field_params(self, params_data):
-        params_with_no = list(filter(lambda x: x[-1] == '0', params_data))
-        how_many_no = len(params_with_no)
-        n = random.randrange(how_many_no)
-        return params_with_no[n]
+    def generate_params(self, params_data, is_bomb):
+        is_bomb = int(is_bomb)
+        correct_params = list(filter(lambda x: x[-1] == f"{is_bomb}", params_data))
+        correct_params_amount = len(correct_params)
+        n = random.randrange(correct_params_amount)
+        return correct_params[n]
