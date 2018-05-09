@@ -32,7 +32,7 @@ class AStar:
     def retrace_path(self, start_field, end_node):
         path = []
         current_field = end_node
-        
+
         while (current_field != start_field):
             path.insert(len(path), current_field)
             current_field = current_field.parent
@@ -43,11 +43,11 @@ class AStar:
 
     def get_distance(self, field_a, field_b):
         if field_b.is_water:
-            special_x = 1000
+            special_x = 40
         elif field_b.is_mud:
-            special_x = 50
+            special_x = 20
         else:
-            special_x = 1
+            special_x = 10
 
         dist_x = abs(field_a.map_x - field_b.map_x)
         dist_y = abs(field_a.map_y - field_b.map_y)
