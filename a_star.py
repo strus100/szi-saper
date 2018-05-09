@@ -44,7 +44,7 @@ class AStar:
     def get_distance(self, field_a, field_b):
         if field_b.is_water:
             special_x = 1000
-        elif field_b.is_mug:
+        elif field_b.is_mud:
             special_x = 50
         else:
             special_x = 1

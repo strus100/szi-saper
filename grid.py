@@ -17,11 +17,11 @@ class Grid:
             horizontal = []
             for x in range(0, how_many_fields):
                 is_wall_field = self.is_wall_field(how_many_fields, x, y)
-                is_mug = self.is_special_field(not is_wall_field)
-                is_water = self.is_special_field(not is_wall_field) if not is_mug else False
+                is_mud = self.is_special_field(not is_wall_field)
+                is_water = self.is_special_field(not is_wall_field) if not is_mud else False
                 is_bomb = self.is_bomb_field(not is_wall_field, not is_water)
                 field_params = self.generate_params(params_data, is_bomb)
-                field = Field(x, y, field_params, field_size, not is_wall_field, is_bomb, is_mug, is_water)
+                field = Field(x, y, field_params, field_size, not is_wall_field, is_bomb, is_mud, is_water)
                 horizontal.insert(len(horizontal), field)
             self.grid.insert(len(self.grid), horizontal)
 
