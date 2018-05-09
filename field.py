@@ -1,5 +1,5 @@
 class Field:
-    def __init__(self, x, y, params, size, walkable = True, has_bomb = False):
+    def __init__(self, x, y, params, size, walkable=True, has_bomb=False, is_mug=False, is_water=False):
         self.x = x
         self.y = y
         self.map_x = x * size
@@ -7,8 +7,17 @@ class Field:
         self.params = params
         self.walkable = walkable
         self.has_bomb = has_bomb
+        self.is_mug = is_mug
+        self.is_water = is_water
 
-        self.color = (0,0,0) if not walkable else (0,255,0)
+        if is_mug:
+            self.color = (100, 0, 0)
+        elif is_water:
+            self.color = (0, 0, 100)
+        elif walkable:
+            self.color = (0, 255, 0)
+        else:
+            self.color = (0, 0, 0)
 
         self.g_cost = 0
         self.h_cost = 0
