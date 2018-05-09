@@ -1,6 +1,6 @@
 import pygame
 from grid import Grid
-from parser import Parser
+from parseros import Parser
 from a_star import AStar
 
 pygame.init()
