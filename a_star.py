@@ -42,9 +42,16 @@ class AStar:
         return path
 
     def get_distance(self, field_a, field_b):
+        if field_b.is_water:
+            special_x = 1000
+        elif field_b.is_mug:
+            special_x = 50
+        else:
+            special_x = 1
+
         dist_x = abs(field_a.map_x - field_b.map_x)
         dist_y = abs(field_a.map_y - field_b.map_y)
 
         if dist_x > dist_y:
-            return 14*dist_y + 10*(dist_x-dist_y)
-        return 14*dist_y + 10*(dist_y-dist_x)
+            return (14*dist_y + 10*(dist_x-dist_y))*special_x
+        return (14*dist_y + 10*(dist_y-dist_x))*special_x

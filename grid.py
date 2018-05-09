@@ -29,18 +29,18 @@ class Grid:
         if (x == (how_many_fields-1) and (y == (how_many_fields-1))):
             is_wall_field = False
         else:
-            is_wall_field = random.randrange(12) == 1
+            is_wall_field = random.randrange(8) == 1
         return is_wall_field
 
     def is_special_field(self, is_walkable):
         if is_walkable:
-            return random.randrange(8) == 1
+            return random.randrange(5) == 1
         else:
             return False
 
     def is_bomb_field(self, is_walkable, is_not_water):
         if is_walkable and is_not_water:
-            return random.randrange(30) == 1
+            return random.randrange(20) == 1
         else:
             return False
 
