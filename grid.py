@@ -19,7 +19,7 @@ class Grid:
                 is_wall_field = self.is_wall_field(how_many_fields, x, y)
                 is_mug = self.is_special_field(not is_wall_field)
                 is_water = self.is_special_field(not is_wall_field) if not is_mug else False
-                is_bomb = self.is_special_field(not is_wall_field) if not is_water else False
+                is_bomb = self.is_bomb_field(not is_wall_field, not is_water)
                 field_params = self.generate_params(params_data, is_bomb)
                 field = Field(x, y, field_params, field_size, not is_wall_field, is_bomb, is_mug, is_water)
                 horizontal.insert(len(horizontal), field)
@@ -34,12 +34,12 @@ class Grid:
 
     def is_special_field(self, is_walkable):
         if is_walkable:
-            return random.randrange(30) == 1
+            return random.randrange(8) == 1
         else:
             return False
 
-    def is_bomb_field(self, is_walkable):
-        if is_walkable:
+    def is_bomb_field(self, is_walkable, is_not_water):
+        if is_walkable and is_not_water:
             return random.randrange(30) == 1
         else:
             return False
