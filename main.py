@@ -2,11 +2,12 @@ import pygame
 from grid import Grid
 from parseros import Parser
 from a_star import AStar
+from is_bomb_matcher import IsBombMatcher
 
 pygame.init()
 
-display_width = 800
-display_height = 800
+display_width = 600
+display_height = 600
 
 black = (0,0,0)
 
@@ -46,8 +47,17 @@ def print_alert():
     pygame.display.update()
 
 
+def read_photo(field):
+    is_b = IsBombMatcher()
+    test = "images/web_2591-500x500.jpg"
+    results = is_b.get_result(test)
+    print(results)
+    pass
+
+
 def move_robot(field):
     if field.has_bomb == True:
+        read_photo(field)
         print_alert()
     gameDisplay.blit(robotImg, (field.map_x, field.map_y))
 
