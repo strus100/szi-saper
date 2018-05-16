@@ -1,12 +1,20 @@
 from field import Field
+from PIL import Image
 import random
-
+import glob
 
 
 
 class Grid:
 
+
+
     def __init__(self, how_many_fields, field_size, params_data):
+        image_list = []
+        for filename in glob.glob('images/*.*'):  # assuming gif
+            im = Image.open(filename)
+            image_list.append(im)
+
         self.grid = []
         self.how_many_fields = how_many_fields
         self.path = []
@@ -21,9 +29,12 @@ class Grid:
                 is_water = self.is_special_field(not is_wall_field) if not is_mud else False
                 is_bomb = self.is_bomb_field(not is_wall_field, not is_water)
                 field_params = self.generate_params(params_data, is_bomb)
-                field = Field(x, y, field_params, field_size, not is_wall_field, is_bomb, is_mud, is_water)
+                field = Field(x, y, field_params, field_size, not is_wall_field, is_bomb, is_mud, is_water, self.get_photo(image_list))
                 horizontal.insert(len(horizontal), field)
             self.grid.insert(len(self.grid), horizontal)
+
+    def get_photo(self, images):
+        return images[random.randrange(len(images))]
 
     def is_wall_field(self, how_many_fields, x, y):
         if (x == (how_many_fields-1) and (y == (how_many_fields-1))):
