@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from result_holder import ResultHolder
 
 import argparse
 import sys
@@ -48,10 +49,8 @@ class IsBombMatcher:
             label.append(l.rstrip())
           return label
 
-    def get_result(self, file_name):
+    def get_result(self, file_name, model_file, label_file):
           # tu miejsce na wczytanie lub podanie grafu
-          model_file = "tf/tf_files/retrained_graph.pb"
-          label_file = "tf/tf_files/retrained_labels.txt"
           input_height = 224
           input_width = 224
           input_mean = 128
@@ -92,7 +91,7 @@ class IsBombMatcher:
           final_results = [top_k];
 
           for i in top_k:
-              result = labels[i] + " = " + str(results[i])
+              result = ResultHolder(labels[i], results[i])
               final_results.append(result)
 
           return final_results;

@@ -47,17 +47,18 @@ def print_alert():
     pygame.display.update()
 
 
-def read_photo(field):
+def read_photo(field, model_file, label_file):
     is_b = IsBombMatcher()
-    test = "images/web_2591-500x500.jpg"
-    results = is_b.get_result(test)
-    print(results)
-    pass
+    results = is_b.get_result(field.photo, model_file, label_file)
+    print(results[1].result_name + " = " + str(results[1].result_percent))
+    return results
 
 
 def move_robot(field):
     if field.has_bomb == True:
-        read_photo(field)
+        model_file = "tf/tf_files/retrained_graph.pb"
+        label_file = "tf/tf_files/retrained_labels.txt"
+        read_photo(field, model_file, label_file)
         print_alert()
     gameDisplay.blit(robotImg, (field.map_x, field.map_y))
 
