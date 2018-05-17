@@ -3,6 +3,10 @@ from grid import Grid
 from parseros import Parser
 from a_star import AStar
 from is_bomb_matcher import IsBombMatcher
+from PIL import Image
+import random
+import glob
+from time import sleep
 
 pygame.init()
 
@@ -36,10 +40,9 @@ def text_objects(text, font):
     textSurface = font.render(text, True, black)
     return textSurface, textSurface.get_rect()
 
-def print_alert():
-    text = "O mamuniu, bomba"
-    
-    large_text = pygame.font.Font('freesansbold.ttf', 90)
+def print_alert(text):
+    print(text)
+    large_text = pygame.font.Font('freesansbold.ttf', 20)
     TextSurf, TextRect = text_objects(text, large_text)
     TextRect.center = ((display_width/2), display_height/2)
     gameDisplay.blit(TextSurf, TextRect)
@@ -50,16 +53,10 @@ def print_alert():
 def read_photo(field, model_file, label_file):
     is_b = IsBombMatcher()
     results = is_b.get_result(field.photo, model_file, label_file)
-    print(results[1].result_name + " = " + str(results[1].result_percent))
     return results
 
 
 def move_robot(field):
-    if field.has_bomb == True:
-        model_file = "tf/tf_files/retrained_graph.pb"
-        label_file = "tf/tf_files/retrained_labels.txt"
-        read_photo(field, model_file, label_file)
-        print_alert()
     gameDisplay.blit(robotImg, (field.map_x, field.map_y))
 
 
@@ -90,7 +87,16 @@ def is_bomb_here(field, tree):
 fields_with_bombs = scan_for_bombs()
 
 
-def game_loop(start_point, fields_with_bombs):
+def get_images(dir):
+    images_list = []
+    for filename in glob.glob(dir):  # assuming gif
+        im = Image.open(filename)
+        images_list.append(im.filename)
+    return images_list
+
+def game_loop(start_point, fields_with_bombs, flowers):
+    model_file = "tf/tf_files_kuba/retrained_graph.pb"
+    label_file = "tf/tf_files_kuba/retrained_labels.txt"
     a = AStar()
     current_field = start_point
     field_to_move = fields_with_bombs[0]
@@ -101,7 +107,8 @@ def game_loop(start_point, fields_with_bombs):
 
     gameExit = False
 
-    while not gameExit: 
+    while not gameExit:
+
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -123,12 +130,41 @@ def game_loop(start_point, fields_with_bombs):
             fields_with_bombs.remove(field_to_move)
             path = a.find_path(current_field, field_to_move, map_obj)
             move_robot(current_field)
-        
+
+        if current_field == field_to_move:
+            make_action_with_bomb(current_field, label_file, model_file)
+            remove_bomb(current_field, flowers)
+            sleep(1)
+
         pygame.display.update()
         clock.tick(3)
 
-first_field
 
-game_loop(first_field, fields_with_bombs)
+def make_action_with_bomb(current_field, label_file, model_file):
+    what_bomb = read_photo(current_field, model_file, label_file)[1]
+
+    found = "Znaleziono: " + what_bomb.result_name + " na " + str(what_bomb.result_percent * 100)[:5] + "%"
+    if what_bomb.result_name == "bomba":
+        action = "Detonuje!, "
+    elif what_bomb.result_name == "c4":
+        action = "Rozbrajam!, "
+    elif what_bomb.result_name == "dynamit":
+        action = "Zabieram!, "
+    elif what_bomb.result_name == "mina":
+        action = "Detonuje!, "
+    else:
+        action = "To nie bomba! "
+
+    print_alert(action + found)
+
+
+def remove_bomb(current_field, flowers):
+    current_field.has_bomb = False
+    current_field.image = flowers[random.randrange(len(flowers))]
+
+
+flowers_list = get_images('flowers/*.*')
+
+game_loop(first_field, fields_with_bombs, flowers_list)
 pygame.quit()
 quit()
