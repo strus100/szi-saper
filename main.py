@@ -95,7 +95,7 @@ def get_images(dir):
         images_list.append(im.filename)
     return images_list
 
-def game_loop(start_point, fields_with_bombs, flowers):
+def game_loop(start_point, fields_with_bombs, flowers, last_field):
     model_file = "tf/tf_files_kuba/retrained_graph.pb"
     label_file = "tf/tf_files_kuba/retrained_labels.txt"
 
@@ -106,6 +106,7 @@ def game_loop(start_point, fields_with_bombs, flowers):
     path = a.find_path(current_field, field_to_move, map_obj)
     robot_x = (0)
     robot_y = (0)
+    is_last_field = last_field == current_field
 
     gameExit = False
 
@@ -137,6 +138,9 @@ def game_loop(start_point, fields_with_bombs, flowers):
             make_action_with_bomb(current_field, label_file, model_file)
             remove_bomb(current_field, flowers)
             sleep(1)
+            if len(fields_with_bombs) == 0:
+                pygame.quit()
+                quit()
 
         pygame.display.update()
         clock.tick(3)
@@ -167,6 +171,6 @@ def remove_bomb(current_field, flowers):
 
 flowers_list = get_images('flowers/*.*')
 
-game_loop(first_field, fields_with_bombs, flowers_list)
+game_loop(first_field, fields_with_bombs, flowers_list, fields_with_bombs[len(fields_with_bombs) -1])
 pygame.quit()
 quit()
