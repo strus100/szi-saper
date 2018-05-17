@@ -62,27 +62,28 @@ def move_robot(field):
 
 [first_field, last_field] = map_obj.first_and_last()
 
+
 def scan_for_bombs():
     fields_with_bombs = []
-    p = Parser()
-    tree = p.parse_tree('id3/tree.json')
     for y in map:
         for x in y:
-            if is_bomb_here(x, tree):
+            if is_bomb_here(x):
                 print(x.get_position())
                 fields_with_bombs.insert(len(fields_with_bombs), x)
     return fields_with_bombs
 
-def is_bomb_here(field, tree):
-        factor = tree['value']
-        factor_value = field.params[factor]
-        tree_answer = tree[factor_value]
 
-        if isinstance(tree_answer, str):
-            return True if tree_answer == "YES" else False
-        else:
-            new_tree = tree_answer
-            return is_bomb_here(field, tree_answer)
+def is_bomb_here(field):
+    model_file1 = "tf/tf_files_igor/retrained_graph.pb"
+    label_file1 = "tf/tf_files_igor/retrained_labels.txt"
+    results = read_photo(field, model_file1, label_file1)
+    first_result = results[1]
+
+    if (first_result.result_name == "bomb" and first_result.result_procent*100 > 75):
+        return True
+    else:
+        return False
+
 
 fields_with_bombs = scan_for_bombs()
 
@@ -97,6 +98,7 @@ def get_images(dir):
 def game_loop(start_point, fields_with_bombs, flowers):
     model_file = "tf/tf_files_kuba/retrained_graph.pb"
     label_file = "tf/tf_files_kuba/retrained_labels.txt"
+
     a = AStar()
     current_field = start_point
     field_to_move = fields_with_bombs[0]
