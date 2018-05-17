@@ -79,7 +79,7 @@ def is_bomb_here(field):
     results = read_photo(field, model_file1, label_file1)
     first_result = results[1]
 
-    if (first_result.result_name == "bomb" and first_result.result_procent*100 > 75):
+    if (first_result.result_name == "bomb" and first_result.result_percent*100 > 75):
         return True
     else:
         return False
