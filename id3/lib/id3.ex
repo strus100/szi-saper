@@ -4,7 +4,7 @@ defmodule ID3 do
   # is_beeping: yes/no | metal_detector_beeping: no/weak/hard | is_dugged_up: true/false | war_here?: no/march_of_troops/trenches
   @data_indexes %{is_beeping: 0, metal_detector_beeping: 1, is_dugged_up: 2, war_here: 3, decision: 4}
 
-  def data do
+   def data do
     [
       [1,"hard",1,"trenches",1],
       [1,"weak",1,"march",1],
