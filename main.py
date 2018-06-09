@@ -26,7 +26,7 @@ bombaImg = pygame.image.load('images/bomba.png')
 bombaImg = pygame.transform.scale(bombaImg, (robot_size, robot_size))
 
 parser = Parser()
-field_params = parser.parse_data("data/data.txt")
+field_params = parser.parse_data("data/examples.txt")
 
 map_obj = Grid(how_many_fields, field_size, field_params)
 map = map_obj.grid

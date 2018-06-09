@@ -1,23 +1,12 @@
-#!/usr/local/bin/elixir
 defmodule ID3 do
   @derive [Poison.Encoder]
-  # is_beeping: yes/no | metal_detector_beeping: no/weak/hard | is_dugged_up: true/false | war_here?: no/march_of_troops/trenches
-  @data_indexes %{is_beeping: 0, metal_detector_beeping: 1, is_dugged_up: 2, war_here: 3, decision: 4}
+  @data_indexes %{beeping: 0, bomb_visible: 1, dugged_up: 2, grass_color: 3, is_there_a_big_x_on_this_field: 4, metal_detector_beeping: 5, war_here: 6, decision: 7}
 
-   def data do
-    [
-      [1,"hard",1,"trenches",1],
-      [1,"weak",1,"march",1],
-      [1,"weak",0,"no",1],
-      [1,"no",0,"trenches",1],
-      [0,"hard",1,"trenches",1],
-      [0,"hard",0,"trenches",1],
-      [0,"no",1,"no",0],
-      [0,"weak",1,"trenches",1],
-      [0,"weak",0,"march",0],
-      [0,"hard",1,"no",1],
-      [0,"weak",1,"no",0]
-    ]
+  def get_data() do
+    {:ok, data} = File.read("examples.txt")
+    data
+    |> String.split("\n")
+    |> Enum.map(&(String.split(&1, ", ")))
   end
 
   def generate_tree(data) do
@@ -33,6 +22,9 @@ defmodule ID3 do
           |> Enum.map(fn {x, _y} -> Atom.to_string(x) end)
           |> get_factor_with_highest_gain(data, {"", 0})
 
+        IO.puts "Generating for #{factor}"
+        IO.inspect data
+
         tree = Map.put(%{}, "value", factor)
 
         child_nodes_values = get_factor_values(data, factor)
@@ -47,8 +39,8 @@ defmodule ID3 do
   @spec is_yes_or_no(%{}) :: :yes | :no | :look_further
   defp is_yes_or_no(data) do
     cond do
-      length(data) == filter_data(data, "decision", 1) |> length -> :yes
-      length(data) == filter_data(data, "decision", 0) |> length -> :no
+      length(data) == filter_data(data, "decision", "1") |> length -> :yes
+      length(data) == filter_data(data, "decision", "0") |> length -> :no
       true -> :look_further
     end
   end
@@ -62,7 +54,7 @@ defmodule ID3 do
   end
 
   @spec filter_data(%{}, String.t(), number | String.t()) :: %{}
-  defp filter_data(data, factor, value) do
+  def filter_data(data, factor, value) do
     index = get_factor_index(factor)
     Enum.filter(data, fn x -> Enum.at(x, index) == value end)
   end
@@ -71,7 +63,7 @@ defmodule ID3 do
   defp get_factor_with_highest_gain([], _data, {factor, _gain}), do: factor
   defp get_factor_with_highest_gain([head | tail], data, {_factor, gain} = highest_gain) do
     current_gain = gain(data, head)
-    if current_gain > gain do
+    if current_gain >= gain do
       get_factor_with_highest_gain(tail, data, {head, current_gain})
     else
       get_factor_with_highest_gain(tail, data, highest_gain)
@@ -99,8 +91,8 @@ defmodule ID3 do
 
   defp decision_entrophy(data) do
     total_amount = length(data)
-    yes_amount = decision_amount(data, 1)
-    no_amount = decision_amount(data, 0)
+    yes_amount = decision_amount(data, "1")
+    no_amount = decision_amount(data, "0")
 
     entrophy(yes_amount, no_amount, total_amount)
   end
@@ -113,8 +105,8 @@ defmodule ID3 do
 
   defp factors_entrophy(data, factor_name, factor_value) do
     total_amount = factor_amount(data, factor_name, factor_value)
-    yes_amount = factor_amount(data, factor_name, factor_value, 1)
-    no_amount = factor_amount(data, factor_name, factor_value, 0)
+    yes_amount = factor_amount(data, factor_name, factor_value, "1")
+    no_amount = factor_amount(data, factor_name, factor_value, "0")
 
     entrophy(yes_amount, no_amount, total_amount)
   end
@@ -153,7 +145,7 @@ defmodule ID3 do
   end
 
   @spec get_factor_index(String.t()) :: Integer
-  defp get_factor_index(factor_name) do
+  def get_factor_index(factor_name) do
     factor_name
       |> String.to_atom()
       |> (&Map.get(@data_indexes, &1)).()
@@ -161,11 +153,7 @@ defmodule ID3 do
 
   def main() do
     {:ok, file} = File.open "tree.json", [:write]
-    json = ID3.generate_tree(ID3.data()) |> Poison.encode!()
+    json = ID3.generate_tree(ID3.get_data()) |> Poison.encode!()
     IO.binwrite file, json
   end
 end
-# IO.puts "DFVDFVDFV"
-# {:ok, file} = File.open "tree.json", [:write]
-# json = ID3.generate_tree(ID3.data()) |> Poison.encode!()
-# IO.binwrite file, json

@@ -76,5 +76,5 @@ class Grid:
         return correct_params[n]
 
     def list_to_dict(self, params):
-        [q,w,e,r,t] = params
-        return {"is_beeping": q, "metal_detector_beeping": w, "is_dugged_up": e, "war_here": r}
+        [q,w,e,r,t,y,u,decision] = params
+        return {"beeping": q, "bomb_visible": w, "dugged_up": e, "grass_color": r, "is_there_a_big_x_on_this_field": t, "metal_detector_beeping": y, "war_here": u}
